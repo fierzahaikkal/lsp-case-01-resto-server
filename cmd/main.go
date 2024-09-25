@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/config"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/db"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/admin"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/customer"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/makanan"
@@ -17,7 +18,7 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
-	db, err := pkg.InitDB(cfg)
+	dbConn, err := pkg.InitDB(cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -29,17 +30,21 @@ func main() {
 		Expiration: 60 * 1000, // Limit 20 requests per minute
 	}))
 
-	//auto migrate
-	tableMigrate := db.AutoMigrate(&admin.Admin{}, &customer.Customer{}, &makanan.Makanan{}, &pesanan.Pesanan{})
+    // Run migrations
+    if err := db.Migrate(dbConn); err != nil {
+        log.Fatalf("Failed to migrate database: %v", err)
+    }
 
-	// Add table suffix when creating tables
-	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(tableMigrate)
+    // Seed data
+    if err := db.Seed(dbConn); err != nil {
+        log.Fatalf("Failed to seed database: %v", err)
+    }
 
 	// Repositories
-	adminRepo := admin.NewAdminRepository(db)
-	customerRepo := customer.NewCustomerRepository(db)
-	makananRepo := makanan.NewMakananRepository(db)
-	pesananRepo := pesanan.NewPesananRepository(db)
+	adminRepo := admin.NewAdminRepository(dbConn)
+	customerRepo := customer.NewCustomerRepository(dbConn)
+	makananRepo := makanan.NewMakananRepository(dbConn)
+	pesananRepo := pesanan.NewPesananRepository(dbConn)
 
 	// Services
 	adminService := admin.NewAdminService(adminRepo)
