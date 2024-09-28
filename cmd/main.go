@@ -13,6 +13,7 @@ import (
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/pkg"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
@@ -34,8 +35,16 @@ func main() {
 		log.Println("Database seeded successfully")
 	}
 
-
 	app := fiber.New()
+
+	// Initialize default config
+app.Use(cors.New())
+
+// Or extend your config for customization
+app.Use(cors.New(cors.Config{
+    AllowOrigins: "https://gofiber.io, https://gofiber.net",
+    AllowHeaders: "Origin, Content-Type, Accept",
+}))
 
 	app.Use(limiter.New(limiter.Config{
 		Max:        20,
@@ -66,31 +75,32 @@ func main() {
 	pesananHandler := pesanan.NewPesananHandler(pesananService)
 
 	// Admin routes
-	app.Post("/admin", adminHandler.CreateAdmin)
-	app.Get("/admin/:id", adminHandler.GetAdmin)
-	app.Put("/admin/:id", adminHandler.UpdateAdmin)
-	app.Delete("/admin/:id", adminHandler.DeleteAdmin)
+	app.Post("/api/v1/admin", adminHandler.CreateAdmin)
+	app.Get("/api/v1/admin/:id", adminHandler.GetAdmin)
+	app.Put("/api/v1/admin/:id", adminHandler.UpdateAdmin)
+	app.Delete("/api/v1/admin/:id", adminHandler.DeleteAdmin)
 
 	// Customer routes
-	app.Post("/customer", customerHandler.CreateCustomer)
-	app.Get("/customer/:id", customerHandler.GetCustomer)
-	app.Put("/customer/:id", customerHandler.UpdateCustomer)
-	app.Delete("/customer/:id", customerHandler.DeleteCustomer)
+	app.Post("/api/v1/customer", customerHandler.CreateCustomer)
+	app.Get("/api/v1/customer/:id", customerHandler.GetCustomer)
+	app.Put("/api/v1/customer/:id", customerHandler.UpdateCustomer)
+	app.Delete("/api/v1/customer/:id", customerHandler.DeleteCustomer)
 
 	// Menu routes
-	app.Post("/menu", menuHandler.CreateMenu)
-	app.Get("/menu/:id", menuHandler.GetMenu)
-	app.Put("/menu/:id", menuHandler.UpdateMenu)
-	app.Delete("/menu/:id", menuHandler.DeleteMenu)
+	app.Get("/api/v1/menu", menuHandler.GetMenu)
+	app.Post("/api/v1/menu", menuHandler.CreateMenu)
+	app.Get("/api/v1/menu/:id", menuHandler.GetMenuByID)
+	app.Put("/api/v1/menu/:id", menuHandler.UpdateMenu)
+	app.Delete("/api/v1/menu/:id", menuHandler.DeleteMenu)
 
 	// Pesanan routes
-	app.Get("/pesanan", pesananHandler.GetPesanan)
-	app.Post("/pesanan", pesananHandler.CreatePesanan)
-	app.Get("/pesanan/:id", pesananHandler.GetPesanan)
-	app.Get("/pesanan/cetak", pesananHandler.CetakPesanan)
-	app.Get("/pesanan/cetak/:id", pesananHandler.CetakPesananByID)
-	app.Put("/pesanan/:id", pesananHandler.UpdatePesanan)
-	app.Delete("/pesanan/:id", pesananHandler.DeletePesanan)
+	app.Get("/api/v1/pesanan", pesananHandler.GetPesanan)
+	app.Post("/api/v1/pesanan", pesananHandler.CreatePesanan)
+	app.Get("/api/v1/pesanan/:id", pesananHandler.GetPesananByID)
+	app.Get("/api/v1/pesanan/cetak", pesananHandler.CetakPesanan)
+	app.Get("/api/v1/pesanan/cetak/:id", pesananHandler.CetakPesananByID)
+	app.Put("/api/v1/pesanan/:id", pesananHandler.UpdatePesanan)
+	app.Delete("/api/v1/pesanan/:id", pesananHandler.DeletePesanan)
 
 	// Start the server
 	log.Fatal(app.Listen(":8000"))

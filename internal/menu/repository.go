@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type MenuRepository interface {
 	CreateMenu(menu Menu) error
+	GetMenu() ([]Menu, error)
 	GetMenuByID(id string) (*Menu, error)
 	UpdateMenu(menu Menu) error
 	DeleteMenu(id string) error
@@ -20,6 +21,12 @@ func NewMenuRepository(db *gorm.DB) MenuRepository {
 func (r *menuRepo) CreateMenu(menu Menu) error {
 	return r.db.Create(&menu).Error
 }
+
+func (r *menuRepo) GetMenu() ([]Menu, error) {
+	var menu []Menu
+	err := r.db.Find(&menu).Error
+	return menu, err
+} 
 
 func (r *menuRepo) GetMenuByID(id string) (*Menu, error) {
 	var menu Menu

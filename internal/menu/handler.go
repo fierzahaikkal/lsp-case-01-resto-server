@@ -26,12 +26,20 @@ func (h *MenuHandler) CreateMenu(c *fiber.Ctx) error {
 }
 
 func (h *MenuHandler) GetMenu(c *fiber.Ctx) error {
-	id := c.Params("id")
-	menu, err := h.service.GetMenuByID(id)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Menu not found"})
-	}
-	return c.JSON(menu)
+    pesanans, err := h.service.GetMenu()
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+    }
+    return c.JSON(pesanans)
+}
+
+func (h *MenuHandler) GetMenuByID(c *fiber.Ctx) error {
+    id := c.Params("id")
+    pesanan, err := h.service.GetMenuByID(id)
+    if err != nil {
+        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Pesanan not found"})
+    }
+    return c.JSON(pesanan)
 }
 
 func (h *MenuHandler) UpdateMenu(c *fiber.Ctx) error {

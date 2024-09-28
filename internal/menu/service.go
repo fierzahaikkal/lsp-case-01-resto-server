@@ -4,6 +4,7 @@ import "github.com/go-playground/validator/v10"
 
 type MenuService interface {
 	CreateMenu(menu Menu) error
+	GetMenu() ([]Menu, error)
 	GetMenuByID(id string) (*Menu, error)
 	UpdateMenu(menu Menu) error
 	DeleteMenu(id string) error
@@ -24,6 +25,10 @@ func (s *menuService) CreateMenu(menu Menu) error {
 		return err
 	}
 	return s.repo.CreateMenu(menu)
+}
+
+func (s *menuService) GetMenu() ([]Menu, error) {
+	return s.repo.GetMenu()
 }
 
 func (s *menuService) GetMenuByID(id string) (*Menu, error) {
