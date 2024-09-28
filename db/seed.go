@@ -27,10 +27,10 @@ func Seed(db *gorm.DB) error {
 
     // Insert some Food (Menu)
     foods := []Menu{
-        {ID: uuid.New(), Nama: "Nasi Goreng", Stok: 50, Kategori: "menu utama", URI_image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
-        {ID: uuid.New(), Nama: "Es Teh", Stok: 100, Kategori: "minuman", URI_image: "https://images.unsplash.com/photo-1683170275059-302acae79168?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGljZSUyMHRlYXxlbnwwfHwwfHx8MA%3D%3D"},
-        {ID: uuid.New(), Nama: "Mie Rebus", Stok: 50, Kategori: "menu utama", URI_image: "https://images.unsplash.com/photo-1593179241557-bce1eb92e47e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
-        {ID: uuid.New(), Nama: "Ice Cream", Stok: 100, Kategori: "appetizer", URI_image: "https://images.unsplash.com/photo-1590080962330-747c6aba8028?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGljZSUyMGNyZWFtfGVufDB8fDB8fHww"},
+        {ID: uuid.New(), Nama: "Nasi Goreng", Stok: 50, Kategori: "menu utama", Harga:30000, URI_image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+        {ID: uuid.New(), Nama: "Es Teh", Stok: 100, Kategori: "minuman", Harga:10000, URI_image: "https://images.unsplash.com/photo-1683170275059-302acae79168?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGljZSUyMHRlYXxlbnwwfHwwfHx8MA%3D%3D"},
+        {ID: uuid.New(), Nama: "Mie Rebus", Stok: 50, Kategori: "menu utama", Harga:25000, URI_image: "https://images.unsplash.com/photo-1593179241557-bce1eb92e47e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+        {ID: uuid.New(), Nama: "Ice Cream", Stok: 100, Kategori: "appetizer", Harga:10000, URI_image: "https://images.unsplash.com/photo-1590080962330-747c6aba8028?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGljZSUyMGNyZWFtfGVufDB8fDB8fHww"},
 
     }
 

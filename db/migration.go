@@ -36,6 +36,7 @@ type Menu struct {
     ID       uuid.UUID `gorm:"type:uuid;primary_key"`
     Nama     string    `gorm:"size:30;not null"`
     Stok     int       `gorm:"not null"`
+    Harga    int       `gorm:"null"` 
     Kategori string    `gorm:"size:20;not null"`
     URI_image string `gorm:"not null"`  // Enum: 'menu utama', 'appetizer', 'minuman'
 }
