@@ -26,12 +26,37 @@ func (h *PesananHandler) CreatePesanan(c *fiber.Ctx) error {
 }
 
 func (h *PesananHandler) GetPesanan(c *fiber.Ctx) error {
-	id := c.Params("id")
-	pesanan, err := h.service.GetPesananByID(id)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Pesanan not found"})
-	}
-	return c.JSON(pesanan)
+    pesanans, err := h.service.GetPesanan()
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+    }
+    return c.JSON(pesanans)
+}
+
+func (h *PesananHandler) GetPesananByID(c *fiber.Ctx) error {
+    id := c.Params("id")
+    pesanan, err := h.service.GetPesananByID(id)
+    if err != nil {
+        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Pesanan not found"})
+    }
+    return c.JSON(pesanan)
+}
+
+func (h *PesananHandler) CetakPesanan(c *fiber.Ctx) error {
+    pesanans, err := h.service.CetakPesanan()
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+    }
+    return c.JSON(pesanans)
+}
+
+func (h *PesananHandler) CetakPesananByID(c *fiber.Ctx) error {
+    id := c.Params("id")
+    pesanan, err := h.service.CetakPesananByID(id)
+    if err != nil {
+        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Pesanan not found or not completed"})
+    }
+    return c.JSON(pesanan)
 }
 
 func (h *PesananHandler) UpdatePesanan(c *fiber.Ctx) error {

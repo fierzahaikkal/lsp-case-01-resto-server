@@ -9,5 +9,5 @@ type Pesanan struct {
 	Harga          int       `gorm:"not null"`
 	JenisTransaksi string    `gorm:"type:enum('tunai', 'non tunai');not null"`
 	CustomerID     uuid.UUID `gorm:"type:uuid;not null"`
-	MakananID      uuid.UUID `gorm:"type:uuid;not null"`
+	MenuID      uuid.UUID `gorm:"type:uuid;not null"`
 }

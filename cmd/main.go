@@ -1,13 +1,14 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/config"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/db"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/admin"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/customer"
-	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/makanan"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/menu"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/pesanan"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/pkg"
 
@@ -18,10 +19,21 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
+	doSeed := flag.Bool("seed", false, "Seed the database with initial data")
+	flag.Parse()
+
 	dbConn, err := pkg.InitDB(cfg)
 	if err != nil {
 		panic(err)
 	}
+
+	if *doSeed {
+		if err := db.Seed(dbConn); err != nil {
+			log.Fatalf("Failed to seed database: %v", err)
+		}
+		log.Println("Database seeded successfully")
+	}
+
 
 	app := fiber.New()
 
@@ -35,53 +47,51 @@ func main() {
         log.Fatalf("Failed to migrate database: %v", err)
     }
 
-    // Seed data
-    if err := db.Seed(dbConn); err != nil {
-        log.Fatalf("Failed to seed database: %v", err)
-    }
-
 	// Repositories
 	adminRepo := admin.NewAdminRepository(dbConn)
 	customerRepo := customer.NewCustomerRepository(dbConn)
-	makananRepo := makanan.NewMakananRepository(dbConn)
+	menuRepo := menu.NewMenuRepository(dbConn)
 	pesananRepo := pesanan.NewPesananRepository(dbConn)
 
 	// Services
 	adminService := admin.NewAdminService(adminRepo)
 	customerService := customer.NewCustomerService(customerRepo)
-	makananService := makanan.NewMakananService(makananRepo)
+	menuService := menu.NewMenuService(menuRepo)
 	pesananService := pesanan.NewPesananService(pesananRepo)
 
 	// Handlers
 	adminHandler := admin.NewAdminHandler(adminService)
 	customerHandler := customer.NewCustomerHandler(customerService)
-	makananHandler := makanan.NewMakananHandler(makananService)
+	menuHandler := menu.NewMenuHandler(menuService)
 	pesananHandler := pesanan.NewPesananHandler(pesananService)
 
 	// Admin routes
-	app.Post("/admins", adminHandler.CreateAdmin)
-	app.Get("/admins/:id", adminHandler.GetAdmin)
-	app.Put("/admins/:id", adminHandler.UpdateAdmin)
-	app.Delete("/admins/:id", adminHandler.DeleteAdmin)
+	app.Post("/admin", adminHandler.CreateAdmin)
+	app.Get("/admin/:id", adminHandler.GetAdmin)
+	app.Put("/admin/:id", adminHandler.UpdateAdmin)
+	app.Delete("/admin/:id", adminHandler.DeleteAdmin)
 
 	// Customer routes
-	app.Post("/customers", customerHandler.CreateCustomer)
-	app.Get("/customers/:id", customerHandler.GetCustomer)
-	app.Put("/customers/:id", customerHandler.UpdateCustomer)
-	app.Delete("/customers/:id", customerHandler.DeleteCustomer)
+	app.Post("/customer", customerHandler.CreateCustomer)
+	app.Get("/customer/:id", customerHandler.GetCustomer)
+	app.Put("/customer/:id", customerHandler.UpdateCustomer)
+	app.Delete("/customer/:id", customerHandler.DeleteCustomer)
 
-	// Makanan routes
-	app.Post("/makanans", makananHandler.CreateMakanan)
-	app.Get("/makanans/:id", makananHandler.GetMakanan)
-	app.Put("/makanans/:id", makananHandler.UpdateMakanan)
-	app.Delete("/makanans/:id", makananHandler.DeleteMakanan)
+	// Menu routes
+	app.Post("/menu", menuHandler.CreateMenu)
+	app.Get("/menu/:id", menuHandler.GetMenu)
+	app.Put("/menu/:id", menuHandler.UpdateMenu)
+	app.Delete("/menu/:id", menuHandler.DeleteMenu)
 
 	// Pesanan routes
-	app.Post("/pesanans", pesananHandler.CreatePesanan)
-	app.Get("/pesanans/:id", pesananHandler.GetPesanan)
-	app.Put("/pesanans/:id", pesananHandler.UpdatePesanan)
-	app.Delete("/pesanans/:id", pesananHandler.DeletePesanan)
+	app.Get("/pesanan", pesananHandler.GetPesanan)
+	app.Post("/pesanan", pesananHandler.CreatePesanan)
+	app.Get("/pesanan/:id", pesananHandler.GetPesanan)
+	app.Get("/pesanan/cetak", pesananHandler.CetakPesanan)
+	app.Get("/pesanan/cetak/:id", pesananHandler.CetakPesananByID)
+	app.Put("/pesanan/:id", pesananHandler.UpdatePesanan)
+	app.Delete("/pesanan/:id", pesananHandler.DeletePesanan)
 
 	// Start the server
-	log.Fatal(app.Listen(":8080"))
+	log.Fatal(app.Listen(":8000"))
 }

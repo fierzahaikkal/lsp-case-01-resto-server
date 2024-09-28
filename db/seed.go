@@ -25,16 +25,22 @@ func Seed(db *gorm.DB) error {
         {ID: uuid.New(), Nama: "Customer Two", Alamat: "456 Address", Telepon: "081234567891", Username: "cust2", Sandi: "password2", RoleID: roles[1].ID},
     }
 
-    // Insert some Food (Makanan)
-    foods := []Makanan{
-        {ID: uuid.New(), Nama: "Nasi Goreng", Stok: 50, Kategori: "makanan utama"},
-        {ID: uuid.New(), Nama: "Es Teh", Stok: 100, Kategori: "minuman"},
+    // Insert some Food (Menu)
+    foods := []Menu{
+        {ID: uuid.New(), Nama: "Nasi Goreng", Stok: 50, Kategori: "menu utama", URI_image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+        {ID: uuid.New(), Nama: "Es Teh", Stok: 100, Kategori: "minuman", URI_image: "https://images.unsplash.com/photo-1683170275059-302acae79168?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGljZSUyMHRlYXxlbnwwfHwwfHx8MA%3D%3D"},
+        {ID: uuid.New(), Nama: "Mie Rebus", Stok: 50, Kategori: "menu utama", URI_image: "https://images.unsplash.com/photo-1593179241557-bce1eb92e47e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+        {ID: uuid.New(), Nama: "Ice Cream", Stok: 100, Kategori: "appetizer", URI_image: "https://images.unsplash.com/photo-1590080962330-747c6aba8028?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGljZSUyMGNyZWFtfGVufDB8fDB8fHww"},
+
     }
 
     // Insert Orders (Pesanan)
     orders := []Pesanan{
-        {ID: uuid.New(), StatusOrder: "menunggu", Jumlah: 2, Harga: 20000, JenisTransaksi: "tunai", UserID: customers[0].ID, MakananID: foods[0].ID},
-        {ID: uuid.New(), StatusOrder: "dibuat", Jumlah: 1, Harga: 5000, JenisTransaksi: "non tunai", UserID: customers[1].ID, MakananID: foods[1].ID},
+        {ID: uuid.New(), StatusOrder: "menunggu", Jumlah: 2, Harga: 20000, JenisTransaksi: "tunai", UserID: customers[0].ID, MenuID: foods[0].ID},
+        {ID: uuid.New(), StatusOrder: "dibuat", Jumlah: 1, Harga: 5000, JenisTransaksi: "non tunai", UserID: customers[1].ID, MenuID: foods[1].ID},
+        {ID: uuid.New(), StatusOrder: "selesai", Jumlah: 1, Harga: 5000, JenisTransaksi: "tunai", UserID: customers[1].ID, MenuID: foods[2].ID},
+        {ID: uuid.New(), StatusOrder: "selesai", Jumlah: 1, Harga: 5000, JenisTransaksi: "non tunai", UserID: customers[0].ID, MenuID: foods[3].ID},
+
     }
 
     // Insert into database

@@ -4,8 +4,11 @@ import "github.com/go-playground/validator/v10"
 
 type PesananService interface {
 	CreatePesanan(pesanan Pesanan) error
+	GetPesanan() ([]Pesanan, error)
 	GetPesananByID(id string) (*Pesanan, error)
 	UpdatePesanan(pesanan Pesanan) error
+	CetakPesanan() ([]Pesanan, error)
+	CetakPesananByID(id string) (*Pesanan, error)
 	DeletePesanan(id string) error
 }
 
@@ -27,9 +30,21 @@ func (s *pesananService) CreatePesanan(pesanan Pesanan) error {
 }
 
 //TODO: GetPesanan
+func (s *pesananService) GetPesanan() ([]Pesanan, error){
+	return s.repo.GetPesanan()
+}
+
 
 func (s *pesananService) GetPesananByID(id string) (*Pesanan, error) {
 	return s.repo.GetPesananByID(id)
+}
+
+func (s *pesananService) CetakPesanan() ([]Pesanan, error) {
+	return s.repo.CetakPesanan()
+}
+
+func (s *pesananService) CetakPesananByID(id string) (*Pesanan, error){
+	return s.repo.CetakPesananByID(id)
 }
 
 func (s *pesananService) UpdatePesanan(pesanan Pesanan) error {
