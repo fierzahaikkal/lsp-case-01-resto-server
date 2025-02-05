@@ -18,4 +18,5 @@ type Customer struct {
 	OrderID  uuid.UUID `gorm:"type:uuid"`
 	createdAt time.Time
 	updatedAt time.Time
+	Order []Order `gorm:"foreignKey:CustomerID"`
 }
