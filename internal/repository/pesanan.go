@@ -1,4 +1,4 @@
-package pesanan
+package repository
 
 import "gorm.io/gorm"
 

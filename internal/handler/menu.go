@@ -1,4 +1,4 @@
-package menu
+package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -60,3 +60,4 @@ func (h *MenuHandler) DeleteMenu(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusNoContent).Send(nil)
 }
+	

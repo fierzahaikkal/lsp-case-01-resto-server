@@ -1,4 +1,4 @@
-package admin
+package repository
 
 import (
 	"gorm.io/gorm"
