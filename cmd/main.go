@@ -4,12 +4,11 @@ import (
 	"flag"
 	"log"
 
-	"github.com/fierzahaikkal/lsp-case-01-resto-server/config"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/db"
-	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/admin"
-	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/customer"
-	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/menu"
-	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/pesanan"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/configs"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/handler"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/repository"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/usecase"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/pkg"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +17,7 @@ import (
 )
 
 func main() {
-	cfg := config.LoadConfig()
+	cfg := configs.LoadConfig()
 
 	doSeed := flag.Bool("seed", false, "Seed the database with initial data")
 	flag.Parse()
@@ -57,22 +56,22 @@ app.Use(cors.New(cors.Config{
     }
 
 	// Repositories
-	adminRepo := admin.NewAdminRepository(dbConn)
-	customerRepo := customer.NewCustomerRepository(dbConn)
-	menuRepo := menu.NewMenuRepository(dbConn)
-	pesananRepo := pesanan.NewPesananRepository(dbConn)
+	adminRepo := repository.NewAdminRepository(dbConn)
+	customerRepo := repository.NewCustomerRepository(dbConn)
+	menuRepo := repository.NewMenuRepository(dbConn)
+	pesananRepo := repository.NewPesananRepository(dbConn)
 
 	// Services
-	adminService := admin.NewAdminService(adminRepo)
-	customerService := customer.NewCustomerService(customerRepo)
-	menuService := menu.NewMenuService(menuRepo)
-	pesananService := pesanan.NewPesananService(pesananRepo)
+	adminService := usecase.NewAdminService(adminRepo)
+	customerService := usecase.NewCustomerService(customerRepo)
+	menuService := usecase.NewMenuService(menuRepo)
+	pesananService := usecase.NewPesananService(pesananRepo)
 
 	// Handlers
-	adminHandler := admin.NewAdminHandler(adminService)
-	customerHandler := customer.NewCustomerHandler(customerService)
-	menuHandler := menu.NewMenuHandler(menuService)
-	pesananHandler := pesanan.NewPesananHandler(pesananService)
+	adminHandler := handler.NewAdminHandler(adminService)
+	customerHandler := handler.NewCustomerHandler(customerService)
+	menuHandler := handler.NewMenuHandler(menuService)
+	pesananHandler := handler.NewPesananHandler(pesananService)
 
 	// Admin routes
 	app.Post("/api/v1/admin", adminHandler.CreateAdmin)

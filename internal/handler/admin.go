@@ -1,33 +1,49 @@
 package handler
 
 import (
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/model"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/usecase"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/pkg/utils"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 type AdminHandler struct {
-	service AdminService
+	uc usecase.AdminUsecase
 }
 
-func NewAdminHandler(service AdminService) *AdminHandler {
-	return &AdminHandler{service}
+func NewAdminHandler(uc usecase.AdminUsecase) *AdminHandler {
+	return &AdminHandler{uc}
 }
 
 func (h *AdminHandler) CreateAdmin(c *fiber.Ctx) error {
-	var admin Admin
-	if err := c.BodyParser(&admin); err != nil {
+	var req model.RequestSignUpAdmin
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	admin.ID = uuid.New()
-	if err := h.service.CreateAdmin(admin); err != nil {
+	// req.ID = uuid.New() -> uuid will automatically generate from postgresql
+	if err := h.uc.Create()(&req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(fiber.StatusCreated).JSON(admin)
+	return c.Status(fiber.StatusCreated).JSON(req)
 }
 
 func (h *AdminHandler) GetAdmin(c *fiber.Ctx) error {
 	id := c.Params("id")
-	admin, err := h.service.GetAdminByID(id)
+
+	parsedUUID, err := utils.ParseUUID(id)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	if utils.IsEmptyUUID(parsedUUID) {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "UUID cannot be empty",
+		})
+	}
+
+	admin, err := h.service.GetAdminByID(parsedUUID)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Admin not found"})
 	}
