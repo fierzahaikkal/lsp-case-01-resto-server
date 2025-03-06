@@ -5,6 +5,7 @@ import (
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/usecase"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/pkg/utils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type AdminHandler struct {
@@ -21,10 +22,12 @@ func (h *AdminHandler) CreateAdmin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 	// req.ID = uuid.New() -> uuid will automatically generate from postgresql
-	if err := h.uc.Create()(&req); err != nil {
+	admin, err := h.uc.Create(&req)
+
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(fiber.StatusCreated).JSON(req)
+	return c.Status(fiber.StatusCreated).JSON(admin)
 }
 
 func (h *AdminHandler) GetAdmin(c *fiber.Ctx) error {
@@ -43,7 +46,7 @@ func (h *AdminHandler) GetAdmin(c *fiber.Ctx) error {
 		})
 	}
 
-	admin, err := h.service.GetAdminByID(parsedUUID)
+	admin, err := h.uc.GetByID(c.Context(), parsedUUID)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Admin not found"})
 	}
@@ -51,20 +54,35 @@ func (h *AdminHandler) GetAdmin(c *fiber.Ctx) error {
 }
 
 func (h *AdminHandler) UpdateAdmin(c *fiber.Ctx) error {
-	var admin Admin
-	if err := c.BodyParser(&admin); err != nil {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid UUID format",
+		})
+	}
+	var req model.RequestUpdateAdmin
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	if err := h.service.UpdateAdmin(admin); err != nil {
+	if err := h.uc.UpdatePartial(c.Context(), id, &req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.JSON(admin)
+	return c.JSON(req)
 }
 
 func (h *AdminHandler) DeleteAdmin(c *fiber.Ctx) error {
 	id := c.Params("id")
-	if err := h.service.DeleteAdmin(id); err != nil {
+	parsedUUID, err := utils.ParseUUID(id)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	admin, err := h.uc.Delete(c.Context(), parsedUUID)
+
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(fiber.StatusNoContent).Send(nil)
+	return c.JSON(admin)
 }

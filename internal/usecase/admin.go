@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
@@ -14,123 +15,110 @@ import (
 
 // AdminUsecase implements AdminUsecase interface
 type AdminUsecase struct {
-    adminRepo repository.AdminRepository
-    validator *validator.Validate
+	adminRepo repository.AdminRepository
+	validator *validator.Validate
 }
 
 // NewAdminUsecase creates a new instance of AdminUsecase
 func NewAdminUsecase(repo repository.AdminRepository) *AdminUsecase {
-    return &AdminUsecase{
-        adminRepo: repo,
-        validator: validator.New(),
-    }
+	return &AdminUsecase{
+		adminRepo: repo,
+		validator: validator.New(),
+	}
 }
 
 // Create handles the business logic for creating a new admin
 func (u *AdminUsecase) Create(req *model.RequestSignUpAdmin) (*entity.Admin, error) {
-    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, errors.New("Password cannot be hash: " + err.Error())
 	}
 
-    if req.Password != req.ValidatePassword {
-        return nil, errors.New("Password not match")
-    }
+	if req.Password != req.ValidatePassword {
+		return nil, errors.New("Password not match")
+	}
 
-    admin := entity.Admin {
-        ID: utils.GenUUID(),
-        Nama: req.Nama,
-        Email: req.Email,
-        Username: req.Password,
-        Password: string(hashedPassword),
-    }
+	admin := entity.Admin{
+		ID:       utils.GenUUID(),
+		Nama:     req.Nama,
+		Email:    req.Email,
+		Username: req.Password,
+		Password: string(hashedPassword),
+	}
 
-    if req == nil {
-        return nil, errors.New("please fill the request")
-    }
+	if req == nil {
+		return nil, errors.New("please fill the request")
+	}
 
-    // Validate admin data
-    if err := u.validator.Struct(req); err != nil {
-        return nil, errors.New("invalid admin data: " + err.Error())
-    }
+	// Validate admin data
+	if err := u.validator.Struct(req); err != nil {
+		return nil, errors.New("invalid admin data: " + err.Error())
+	}
 
-    // Create admin in repository
-    if err := u.adminRepo.CreateAdmin(admin); err != nil {
-        return nil, errors.New("failed to create admin: " + err.Error())
-    }
+	// Create admin in repository
+	if err := u.adminRepo.CreateAdmin(admin); err != nil {
+		return nil, errors.New("failed to create admin: " + err.Error())
+	}
 
-    return &admin, err
+	return &admin, err
 }
 
 // GetByID retrieves an admin by their ID
-func (u *AdminUsecase) GetByID(id uuid.UUID) (*entity.Admin, error) {
-    if id == uuid.Nil {
-        return nil, errors.New("ID not found")
-    }
+func (u *AdminUsecase) GetByID(ctx context.Context, id uuid.UUID) (*entity.Admin, error) {
+	if id == uuid.Nil {
+		return nil, errors.New("ID not found")
+	}
 
-    admin, err := u.adminRepo.GetAdminByID(id)
-    if err != nil {
-        return nil, errors.New("Failed to get admin: " + err.Error())
-    }
+	admin, err := u.adminRepo.GetAdminByID(ctx, id)
+	if err != nil {
+		return nil, errors.New("Failed to get admin: " + err.Error())
+	}
 
-    if admin == nil {
-        return nil, errors.New("Admin not found")
-    }
+	if admin == nil {
+		return nil, errors.New("Admin not found")
+	}
 
-    return admin, nil
+	return admin, nil
 }
 
-// Update handles the business logic for updating an existing admin
-func (u *AdminUsecase) Update(admin *entity.Admin) error {
-    if admin == nil {
-        return errors.New("admin cannot be nil")
-    }
+func (u *AdminUsecase) UpdatePartial(ctx context.Context, id uuid.UUID, req *model.RequestUpdateAdmin) error {
+	updates := make(map[string]interface{})
 
-    if admin.ID == uuid.Nil {
-        return errors.New("invalid UUID")
-    }
+	if req.Username != nil {
+		updates["username"] = *req.Username
+	}
+	if req.Username != nil {
+		updates["email"] = *req.Email
+	}
+	if req.Username != nil {
+		updates["nama"] = *req.Nama
+	}
+	if req.Username != nil {
+		updates["password"] = *req.Password
+	}
 
-    // Validate admin data
-    if err := u.validator.Struct(admin); err != nil {
-        return errors.New("invalid admin data: " + err.Error())
-    }
-
-    // Check if admin exists
-    existingAdmin, err := u.adminRepo.GetAdminByID(admin.ID)
-    if err != nil {
-        return errors.New("failed to check existing admin: " + err.Error())
-    }
-    if existingAdmin == nil {
-        return errors.New("admin not found")
-    }
-
-    // Update admin in repository
-    if err := u.adminRepo.UpdateAdmin(*admin); err != nil {
-        return errors.New("failed to update admin: " + err.Error())
-    }
-
-    return nil
+	return u.adminRepo.UpdateAdmin(ctx, id, updates)
 }
 
 // Delete handles the business logic for deleting an admin
-func (u *AdminUsecase) Delete(id uuid.UUID) (*entity.Admin, error) {
-    if id == uuid.Nil {
-        return nil, errors.New("invalid UUID")
-    }
+func (u *AdminUsecase) Delete(ctx context.Context, id uuid.UUID) (*entity.Admin, error) {
+	if id == uuid.Nil {
+		return nil, errors.New("invalid UUID")
+	}
 
-    // Check if admin exists
-    existingAdmin, err := u.adminRepo.GetAdminByID(id)
-    if err != nil {
-        return nil, errors.New("failed to check existing admin: " + err.Error())
-    }
-    if existingAdmin == nil {
-        return nil, errors.New("admin not found")
-    }
+	// Check if admin exists
+	existingAdmin, err := u.adminRepo.GetAdminByID(ctx, id)
+	if err != nil {
+		return nil, errors.New("failed to check existing admin: " + err.Error())
+	}
+	if existingAdmin == nil {
+		return nil, errors.New("admin not found")
+	}
 
-    // Delete admin from repository
-    if err := u.adminRepo.DeleteAdmin(id); err != nil {
-        return nil, errors.New("failed to delete admin: " + err.Error())
-    }
+	// Delete admin from repository
+	if err := u.adminRepo.DeleteAdmin(id); err != nil {
+		return nil, errors.New("failed to delete admin: " + err.Error())
+	}
 
-    return existingAdmin, nil
+	return existingAdmin, nil
 }
