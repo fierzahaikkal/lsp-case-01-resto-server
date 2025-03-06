@@ -1,20 +1,22 @@
 package handler
 
 import (
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/usecase"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
 type CustomerHandler struct {
-	service CustomerService
+	service usecase.CustomerService
 }
 
-func NewCustomerHandler(service CustomerService) *CustomerHandler {
+func NewCustomerHandler(service usecase.CustomerService) *CustomerHandler {
 	return &CustomerHandler{service}
 }
 
 func (h *CustomerHandler) CreateCustomer(c *fiber.Ctx) error {
-	var customer Customer
+	var customer entity.Customer
 	if err := c.BodyParser(&customer); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -35,7 +37,7 @@ func (h *CustomerHandler) GetCustomer(c *fiber.Ctx) error {
 }
 
 func (h *CustomerHandler) UpdateCustomer(c *fiber.Ctx) error {
-	var customer Customer
+	var customer entity.Customer
 	if err := c.BodyParser(&customer); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}

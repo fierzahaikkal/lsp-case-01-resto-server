@@ -1,27 +1,31 @@
 package usecase
 
-import "github.com/go-playground/validator/v10"
+import (
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/repository"
+	"github.com/go-playground/validator/v10"
+)
 
 type PesananService interface {
-	CreatePesanan(pesanan Pesanan) error
-	GetPesanan() ([]Pesanan, error)
-	GetPesananByID(id string) (*Pesanan, error)
-	UpdatePesanan(pesanan Pesanan) error
-	CetakPesanan() ([]Pesanan, error)
-	CetakPesananByID(id string) (*Pesanan, error)
+	CreatePesanan(pesanan entity.Pesanan) error
+	GetPesanan() ([]entity.Pesanan, error)
+	GetPesananByID(id string) (*entity.Pesanan, error)
+	UpdatePesanan(pesanan entity.Pesanan) error
+	CetakPesanan() ([]entity.Pesanan, error)
+	CetakPesananByID(id string) (*entity.Pesanan, error)
 	DeletePesanan(id string) error
 }
 
 type pesananService struct {
-	repo      PesananRepository
+	repo      repository.PesananRepository
 	validator *validator.Validate
 }
 
-func NewPesananService(repo PesananRepository) PesananService {
+func NewPesananService(repo repository.PesananRepository) PesananService {
 	return &pesananService{repo: repo, validator: validator.New()}
 }
 
-func (s *pesananService) CreatePesanan(pesanan Pesanan) error {
+func (s *pesananService) CreatePesanan(pesanan entity.Pesanan) error {
 	err := s.validator.Struct(pesanan)
 	if err != nil {
 		return err
@@ -30,24 +34,24 @@ func (s *pesananService) CreatePesanan(pesanan Pesanan) error {
 }
 
 //TODO: GetPesanan
-func (s *pesananService) GetPesanan() ([]Pesanan, error){
+func (s *pesananService) GetPesanan() ([]entity.Pesanan, error){
 	return s.repo.GetPesanan()
 }
 
 
-func (s *pesananService) GetPesananByID(id string) (*Pesanan, error) {
+func (s *pesananService) GetPesananByID(id string) (*entity.Pesanan, error) {
 	return s.repo.GetPesananByID(id)
 }
 
-func (s *pesananService) CetakPesanan() ([]Pesanan, error) {
+func (s *pesananService) CetakPesanan() ([]entity.Pesanan, error) {
 	return s.repo.CetakPesanan()
 }
 
-func (s *pesananService) CetakPesananByID(id string) (*Pesanan, error){
+func (s *pesananService) CetakPesananByID(id string) (*entity.Pesanan, error){
 	return s.repo.CetakPesananByID(id)
 }
 
-func (s *pesananService) UpdatePesanan(pesanan Pesanan) error {
+func (s *pesananService) UpdatePesanan(pesanan entity.Pesanan) error {
 	return s.repo.UpdatePesanan(pesanan)
 }
 

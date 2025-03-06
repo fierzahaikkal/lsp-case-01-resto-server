@@ -17,7 +17,7 @@ type Order struct {
     Notes           string        `gorm:"type:text"`
     CreatedAt       time.Time
     UpdatedAt       time.Time
-    Payment         Payment       `gorm:"foreignKey:OrderID"`
+    Payment         Pembayaran       `gorm:"foreignKey:OrderID"`
 }
 
 type OrderItem struct {

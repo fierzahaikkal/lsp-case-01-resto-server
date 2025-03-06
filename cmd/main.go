@@ -60,18 +60,21 @@ app.Use(cors.New(cors.Config{
 	customerRepo := repository.NewCustomerRepository(dbConn)
 	menuRepo := repository.NewMenuRepository(dbConn)
 	pesananRepo := repository.NewPesananRepository(dbConn)
-
+	pembayaranRepo := repository.NewPembayaranRepository(dbConn)
+	
 	// Services
-	adminService := usecase.NewAdminService(adminRepo)
+	adminService := usecase.NewAdminUsecase(adminRepo)
 	customerService := usecase.NewCustomerService(customerRepo)
 	menuService := usecase.NewMenuService(menuRepo)
 	pesananService := usecase.NewPesananService(pesananRepo)
+	pembayaranService := usecase.NewPembayaranService(pembayaranRepo)
 
 	// Handlers
 	adminHandler := handler.NewAdminHandler(adminService)
 	customerHandler := handler.NewCustomerHandler(customerService)
 	menuHandler := handler.NewMenuHandler(menuService)
 	pesananHandler := handler.NewPesananHandler(pesananService)
+	pembayaranHandler := handler.NewPembayaranHandler(pembayaranService)
 
 	// Admin routes
 	app.Post("/api/v1/admin", adminHandler.CreateAdmin)
@@ -100,6 +103,13 @@ app.Use(cors.New(cors.Config{
 	app.Get("/api/v1/pesanan/cetak/:id", pesananHandler.CetakPesananByID)
 	app.Put("/api/v1/pesanan/:id", pesananHandler.UpdatePesanan)
 	app.Delete("/api/v1/pesanan/:id", pesananHandler.DeletePesanan)
+
+	// Pembayaran routes
+	app.Post("/api/v1/pembayaran", pembayaranHandler.CreatePembayaran)
+	app.Get("/api/v1/pembayaran", pembayaranHandler.GetPembayaran)
+	app.Get("/api/v1/pembayaran/:id", pembayaranHandler.GetPembayaranByID)
+	app.Put("/api/v1/pembayaran/:id", pembayaranHandler.UpdatePembayaran)
+	app.Delete("/api/v1/pembayaran/:id", pembayaranHandler.DeletePembayaran)
 
 	// Start the server
 	log.Fatal(app.Listen(":8000"))

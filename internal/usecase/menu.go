@@ -1,25 +1,29 @@
 package usecase
 
-import "github.com/go-playground/validator/v10"
+import (
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/repository"
+	"github.com/go-playground/validator/v10"
+)
 
 type MenuService interface {
-	CreateMenu(menu Menu) error
-	GetMenu() ([]Menu, error)
-	GetMenuByID(id string) (*Menu, error)
-	UpdateMenu(menu Menu) error
+	CreateMenu(menu entity.Menu) error
+	GetMenu() ([]entity.Menu, error)
+	GetMenuByID(id string) (*entity.Menu, error)
+	UpdateMenu(menu entity.Menu) error
 	DeleteMenu(id string) error
 }
 
 type menuService struct {
-	repo      MenuRepository
+	repo      repository.MenuRepository
 	validator *validator.Validate
 }
 
-func NewMenuService(repo MenuRepository) MenuService {
+func NewMenuService(repo repository.MenuRepository) MenuService {
 	return &menuService{repo: repo, validator: validator.New()}
 }
 
-func (s *menuService) CreateMenu(menu Menu) error {
+func (s *menuService) CreateMenu(menu entity.Menu) error {
 	err := s.validator.Struct(menu)
 	if err != nil {
 		return err
@@ -27,15 +31,15 @@ func (s *menuService) CreateMenu(menu Menu) error {
 	return s.repo.CreateMenu(menu)
 }
 
-func (s *menuService) GetMenu() ([]Menu, error) {
+func (s *menuService) GetMenu() ([]entity.Menu, error) {
 	return s.repo.GetMenu()
 }
 
-func (s *menuService) GetMenuByID(id string) (*Menu, error) {
+func (s *menuService) GetMenuByID(id string) (*entity.Menu, error) {
 	return s.repo.GetMenuByID(id)
 }
 
-func (s *menuService) UpdateMenu(menu Menu) error {
+func (s *menuService) UpdateMenu(menu entity.Menu) error {
 	return s.repo.UpdateMenu(menu)
 }
 

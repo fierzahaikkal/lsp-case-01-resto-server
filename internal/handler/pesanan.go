@@ -1,20 +1,22 @@
 package handler
 
 import (
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/usecase"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
 type PesananHandler struct {
-	service PesananService
+	service usecase.PesananService
 }
 
-func NewPesananHandler(service PesananService) *PesananHandler {
+func NewPesananHandler(service usecase.PesananService) *PesananHandler {
 	return &PesananHandler{service}
 }
 
 func (h *PesananHandler) CreatePesanan(c *fiber.Ctx) error {
-	var pesanan Pesanan
+	var pesanan entity.Pesanan
 	if err := c.BodyParser(&pesanan); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -60,7 +62,7 @@ func (h *PesananHandler) CetakPesananByID(c *fiber.Ctx) error {
 }
 
 func (h *PesananHandler) UpdatePesanan(c *fiber.Ctx) error {
-	var pesanan Pesanan
+	var pesanan entity.Pesanan
 	if err := c.BodyParser(&pesanan); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}

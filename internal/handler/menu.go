@@ -1,20 +1,22 @@
 package handler
 
 import (
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/usecase"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
 type MenuHandler struct {
-	service MenuService
+	service usecase.MenuService
 }
 
-func NewMenuHandler(service MenuService) *MenuHandler {
+func NewMenuHandler(service usecase.MenuService) *MenuHandler {
 	return &MenuHandler{service}
 }
 
 func (h *MenuHandler) CreateMenu(c *fiber.Ctx) error {
-	var menu Menu
+	var menu entity.Menu
 	if err := c.BodyParser(&menu); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -43,7 +45,7 @@ func (h *MenuHandler) GetMenuByID(c *fiber.Ctx) error {
 }
 
 func (h *MenuHandler) UpdateMenu(c *fiber.Ctx) error {
-	var menu Menu
+	var menu entity.Menu
 	if err := c.BodyParser(&menu); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}

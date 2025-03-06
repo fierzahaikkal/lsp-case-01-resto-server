@@ -1,24 +1,28 @@
 package usecase
 
-import "github.com/go-playground/validator/v10"
+import (
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/repository"
+	"github.com/go-playground/validator/v10"
+)
 
 type CustomerService interface {
-	CreateCustomer(customer Customer) error
-	GetCustomerByID(id string) (*Customer, error)
-	UpdateCustomer(customer Customer) error
+	CreateCustomer(customer entity.Customer) error
+	GetCustomerByID(id string) (*entity.Customer, error)
+	UpdateCustomer(customer entity.Customer) error
 	DeleteCustomer(id string) error
 }
 
 type customerService struct {
-	repo      CustomerRepository
+	repo      repository.CustomerRepository
 	validator *validator.Validate
 }
 
-func NewCustomerService(repo CustomerRepository) CustomerService {
+func NewCustomerService(repo repository.CustomerRepository) CustomerService {
 	return &customerService{repo: repo, validator: validator.New()}
 }
 
-func (s *customerService) CreateCustomer(customer Customer) error {
+func (s *customerService) CreateCustomer(customer entity.Customer) error {
 	err := s.validator.Struct(customer)
 	if err != nil {
 		return err
@@ -26,11 +30,11 @@ func (s *customerService) CreateCustomer(customer Customer) error {
 	return s.repo.CreateCustomer(customer)
 }
 
-func (s *customerService) GetCustomerByID(id string) (*Customer, error) {
+func (s *customerService) GetCustomerByID(id string) (*entity.Customer, error) {
 	return s.repo.GetCustomerByID(id)
 }
 
-func (s *customerService) UpdateCustomer(customer Customer) error {
+func (s *customerService) UpdateCustomer(customer entity.Customer) error {
 	return s.repo.UpdateCustomer(customer)
 }
 

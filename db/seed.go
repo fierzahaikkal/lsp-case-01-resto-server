@@ -43,6 +43,14 @@ func Seed(db *gorm.DB) error {
 
     }
 
+    // Insert Pembayaran
+    pembayaran := []Pembayaran{
+        {ID: uuid.New(), OrderID: orders[0].ID, Amount: 20000, PaymentMethod: "tunai", Status: "pending"},
+        {ID: uuid.New(), OrderID: orders[1].ID, Amount: 5000, PaymentMethod: "non tunai", Status: "pending"},
+        {ID: uuid.New(), OrderID: orders[2].ID, Amount: 5000, PaymentMethod: "tunai", Status: "pending"},
+        {ID: uuid.New(), OrderID: orders[3].ID, Amount: 5000, PaymentMethod: "non tunai", Status: "pending"},
+    }
+
     // Insert into database
     if err := db.Create(&roles).Error; err != nil {
         return err
@@ -57,6 +65,9 @@ func Seed(db *gorm.DB) error {
         return err
     }
     if err := db.Create(&orders).Error; err != nil {
+        return err
+    }
+    if err := db.Create(&pembayaran).Error; err != nil {
         return err
     }
 
