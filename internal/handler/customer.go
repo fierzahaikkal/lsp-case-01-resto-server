@@ -1,27 +1,29 @@
 package handler
 
 import (
-	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/model"
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/usecase"
+	"github.com/fierzahaikkal/lsp-case-01-resto-server/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
 type CustomerHandler struct {
-	service usecase.CustomerService
+	uc usecase.CustomerUsecase
 }
 
-func NewCustomerHandler(service usecase.CustomerService) *CustomerHandler {
-	return &CustomerHandler{service}
+func NewCustomerHandler(uc usecase.CustomerUsecase) *CustomerHandler {
+	return &CustomerHandler{uc}
 }
 
 func (h *CustomerHandler) CreateCustomer(c *fiber.Ctx) error {
-	var customer entity.Customer
-	if err := c.BodyParser(&customer); err != nil {
+	var req model.RequestSignUpCustomer
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	customer.ID = uuid.New()
-	if err := h.service.CreateCustomer(customer); err != nil {
+
+	customer, err := h.uc.Create(&req)
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.Status(fiber.StatusCreated).JSON(customer)
@@ -29,7 +31,21 @@ func (h *CustomerHandler) CreateCustomer(c *fiber.Ctx) error {
 
 func (h *CustomerHandler) GetCustomer(c *fiber.Ctx) error {
 	id := c.Params("id")
-	customer, err := h.service.GetCustomerByID(id)
+
+	parsedUUID, err := utils.ParseUUID(id)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	if utils.IsEmptyUUID(parsedUUID) {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "UUID cannot be empty",
+		})
+	}
+
+	customer, err := h.uc.GetByID(c.Context(), parsedUUID)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Customer not found"})
 	}
@@ -37,20 +53,35 @@ func (h *CustomerHandler) GetCustomer(c *fiber.Ctx) error {
 }
 
 func (h *CustomerHandler) UpdateCustomer(c *fiber.Ctx) error {
-	var customer entity.Customer
-	if err := c.BodyParser(&customer); err != nil {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid UUID format",
+		})
+	}
+
+	var req model.RequestSignUpCustomer
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	if err := h.service.UpdateCustomer(customer); err != nil {
+
+	if err := h.uc.UpdatePartial(c.Context(), id, &req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.JSON(customer)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Customer updated successfully"})
 }
 
 func (h *CustomerHandler) DeleteCustomer(c *fiber.Ctx) error {
-	id := c.Params("id")
-	if err := h.service.DeleteCustomer(id); err != nil {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid UUID format",
+		})
+	}
+
+	deletedCustomer, err := h.uc.Delete(c.Context(), id)
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(fiber.StatusNoContent).Send(nil)
+	return c.Status(fiber.StatusOK).JSON(deletedCustomer)
 }

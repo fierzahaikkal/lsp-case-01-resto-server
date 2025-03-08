@@ -10,7 +10,7 @@ type RequestCreateMenu struct {
 }
 
 //omitempty => output didnt print if value is zero
-type RequestupdateMenu struct {
+type RequestUpdateMenu struct {
 	Nama      *string    `json:"namae" validate:"omitempty,min=3,max=100"`
 	Deskripsi *string	`json:"deskripsi" validate:"omitempty"`
 	Stok      *float32   `json:"stok" validate:"omitempty,gt=0"`

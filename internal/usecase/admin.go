@@ -13,22 +13,29 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type AdminUsecase interface {
+	Create(admin *model.RequestSignUpAdmin) (*entity.Admin, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*entity.Admin, error)
+	UpdatePartial(ctx context.Context, id uuid.UUID, req *model.RequestUpdateAdmin) error
+	Delete(ctx context.Context, id uuid.UUID) (*entity.Admin, error)
+}
+
 // AdminUsecase implements AdminUsecase interface
-type AdminUsecase struct {
+type adminUsecase struct {
 	adminRepo repository.AdminRepository
 	validator *validator.Validate
 }
 
 // NewAdminUsecase creates a new instance of AdminUsecase
-func NewAdminUsecase(repo repository.AdminRepository) *AdminUsecase {
-	return &AdminUsecase{
+func NewAdminUsecase(repo repository.AdminRepository) AdminUsecase {
+	return &adminUsecase{
 		adminRepo: repo,
 		validator: validator.New(),
 	}
 }
 
 // Create handles the business logic for creating a new admin
-func (u *AdminUsecase) Create(req *model.RequestSignUpAdmin) (*entity.Admin, error) {
+func (u *adminUsecase) Create(req *model.RequestSignUpAdmin) (*entity.Admin, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, errors.New("Password cannot be hash: " + err.Error())
@@ -64,7 +71,7 @@ func (u *AdminUsecase) Create(req *model.RequestSignUpAdmin) (*entity.Admin, err
 }
 
 // GetByID retrieves an admin by their ID
-func (u *AdminUsecase) GetByID(ctx context.Context, id uuid.UUID) (*entity.Admin, error) {
+func (u *adminUsecase) GetByID(ctx context.Context, id uuid.UUID) (*entity.Admin, error) {
 	if id == uuid.Nil {
 		return nil, errors.New("ID not found")
 	}
@@ -81,7 +88,7 @@ func (u *AdminUsecase) GetByID(ctx context.Context, id uuid.UUID) (*entity.Admin
 	return admin, nil
 }
 
-func (u *AdminUsecase) UpdatePartial(ctx context.Context, id uuid.UUID, req *model.RequestUpdateAdmin) error {
+func (u *adminUsecase) UpdatePartial(ctx context.Context, id uuid.UUID, req *model.RequestUpdateAdmin) error {
 	updates := make(map[string]interface{})
 
 	if req.Username != nil {
@@ -101,7 +108,7 @@ func (u *AdminUsecase) UpdatePartial(ctx context.Context, id uuid.UUID, req *mod
 }
 
 // Delete handles the business logic for deleting an admin
-func (u *AdminUsecase) Delete(ctx context.Context, id uuid.UUID) (*entity.Admin, error) {
+func (u *adminUsecase) Delete(ctx context.Context, id uuid.UUID) (*entity.Admin, error) {
 	if id == uuid.Nil {
 		return nil, errors.New("invalid UUID")
 	}

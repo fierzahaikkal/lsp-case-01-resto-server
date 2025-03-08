@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/fierzahaikkal/lsp-case-01-resto-server/internal/entity"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -10,7 +11,7 @@ type MenuRepository interface {
 	GetMenu() ([]entity.Menu, error)
 	GetMenuByID(id string) (*entity.Menu, error)
 	UpdateMenu(menu entity.Menu) error
-	DeleteMenu(id string) error
+	DeleteMenu(id uuid.UUID) error
 }
 
 type menuRepo struct {
@@ -41,6 +42,6 @@ func (r *menuRepo) UpdateMenu(menu entity.Menu) error {
 	return r.db.Save(&menu).Error
 }
 
-func (r *menuRepo) DeleteMenu(id string) error {
+func (r *menuRepo) DeleteMenu(id uuid.UUID) error {
 	return r.db.Delete(&entity.Menu{}, "id = ?", id).Error
 }
