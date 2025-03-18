@@ -64,7 +64,7 @@ app.Use(cors.New(cors.Config{
 	
 	// Services
 	adminService := usecase.NewAdminUsecase(adminRepo)
-	customerService := usecase.NewCustomerService(customerRepo)
+	customerService := usecase.NewCustomerUsecase(customerRepo)
 	menuService := usecase.NewMenuUsecase(menuRepo)
 	pesananService := usecase.NewPesananService(pesananRepo)
 	pembayaranService := usecase.NewPembayaranService(pembayaranRepo)

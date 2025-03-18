@@ -12,4 +12,5 @@ type RequestSignUpCustomer struct {
 	Alamat   string `json:"alamat" validate:"required,max=100"`
 	Telepon  string `json:"telepon" validate:"required,max=13"`
 	Sandi    string `json:"sandi" validate:"required,min=8,max=30, e164"`
+	RoleID   string `json:"role_id" validate:"required"`
 }
